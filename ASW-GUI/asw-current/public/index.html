@@ -1,0 +1,185 @@
+<link rel="stylesheet" href="style.css" />
+<script src="script.js"></script>
+<h1 id="title">Wearable Design</h1>
+<button id="info-button">?</button>
+<body>
+  <div class="popup">
+    <div class="popup-instructions">
+      <h1 id="popup-title">Instructions</h1>
+      <p id="popup-text"><br>Welcome to the Affect-Sensing Wearable graphical user interface (GUI)!</br><br>Please drag & drop features from the left sidebar onto the jacket image based on the video you have watched. You can consider emotional expression and desired social-physical interaction. From the right sidebar, you can make customizations and selections for various actuation methods.</br><br>Before beginning, please enter your participant number and video code below:</br></p>
+      <div class="popup-identifiers">
+        <label for="participant1" id="pNum1">Participant #:</label>
+        <input type="text" id="participant1"/>
+        <label for="videoNum1" id="vNum1">Video Code:</label>
+        <input type="text" id="videoNum1"/>
+      </div>
+      <button id="continue-button" disabled onclick="continueToGUI()">Continue</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="box">
+      <div class="jacketbox" id="jacketbox">
+        <img src="jacketfront.png" id="jacket-front" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)" style="display: none;"/>
+        <img src="jacketback.png" id="jacket-back" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)" style="display: none;" />
+        <canvas id="jacketCanvas" class="jacket-canvas" width="480" height="550" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)"></canvas>
+        <button id="back-view" onclick="switchView()">Switch to Back</button>
+        <button id="front-view" onclick="switchView()" style="display: none;">Switch to Front</button>
+        <div class="click-create" style="display: none;">
+          <div class="click-item" id="click-fur">Fur Patch</div>
+          <div class="click-item" id="click-light1">Individual Light</div>
+          <div class="click-item" id="click-light2">Light Strip</div>
+          <div class="click-item" id="click-battery">Social Battery Display</div>
+          <div class="click-item" id="click-display">Display Screen</div>
+          <div class="click-item" id="click-speaker">Speaker</div>
+          <div class="click-item" id="click-other">Other</div>
+        </div>
+      </div>
+    </div>
+    <div class="popup-info">
+      <button id="close-info">x</button>
+      <h1 id="info-title">Instructions</h1>
+      <p id="info-text">Drag & drop features from the left sidebar onto the jacket image based on the video you have watched. You can consider emotional expression and desired social-physical interaction. From the right sidebar, you can make customizations and selections for various actuation methods.</p>
+    </div>
+    <div class="sidebar">
+      <!--<button id="info-button">?</button>-->
+      <div class="identifiers">
+        <label for="participant" id="pNum">Participant #:</label>
+        <input type="text" id="participant"/>
+        <label for="videoNum" id="vNum">Video Code:</label>
+        <input type="text" id="videoNum"/>
+      </div>
+      <div class="option">Fur Patch
+        <div class="item-container" id="fur-patch-cont">
+          <div class="fur-patch" id="fur-patch" draggable="true" ondragstart="drag(event)">
+            <div class="fur1" style="top:0px;"></div>
+            <div class="fur2" style="top:10px;"></div>
+            <div class="fur1" style="top:20px;"></div>
+            <div class="fur1" style="top:0px; left:9px;"></div>
+            <div class="fur2" style="top:10px; left:9px;"></div>
+            <div class="fur1" style="top:20px; left:9px;"></div>
+            <div class="fur1" style="top:0px; left:18px;"></div>
+            <div class="fur2" style="top:10px; left:18px;"></div>
+            <div class="fur1" style="top:20px; left:18px;"></div>
+            <div class="fur1" style="top:0px; left:27px;"></div>
+            <div class="fur2" style="top:10px; left:27px;"></div>
+            <div class="fur1" style="top:20px; left:27px;"></div>
+            <div class="fur1" style="top:0px; left:36px;"></div>
+            <div class="fur2" style="top:10px; left:36px;"></div>
+            <div class="fur1" style="top:20px; left:36px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="option">Individual Light
+        <div class="item-container" id="light-ind-cont">
+          <div class="light-ind" id="light-ind" draggable="true" ondragstart="drag(event)"></div>
+        </div>
+      </div>
+      <div class="option">Light Strip
+        <div class="item-container" id="light-strip-cont">
+          <div class="light-strip" id="light-strip" draggable="true" ondragstart="drag(event)">
+            <div class="rectangle"></div>
+            <div class="circle" style="top:-3px;"></div>
+            <div class="circle" style="top:37px;"></div>
+            <div class="circle" style="top:77px;"></div>
+            <div class="circle" style="top:117px;"></div>
+            <div class="circle" style="top:157px;"></div>
+            <div class="circle" style="top:195px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="option">Social Battery Display
+        <div class="item-container" id="battery-cont">
+          <div class="battery" id="battery" draggable="true" ondragstart="drag(event)">
+            <div class="battery1"></div>
+            <div class="battery2"></div>
+          </div>
+        </div>
+      </div>
+      <div class="option">Display Screen
+        <div class="item-container" id="display-cont">
+          <div class="display" id="display" draggable="true" ondragstart="drag(event)"></div>
+        </div>
+      </div>
+      <div class="option">Speaker
+        <div class="item-container" id="speaker-cont">
+          <div class= "speaker" id="speaker" draggable="true" ondragstart="drag(event)">
+            <div class="rectangle2"></div>
+            <div class="trapezoid "></div>
+          </div>
+        </div>
+      </div>
+      <div class="option">Other
+        <div class="item-container" id="other-cont">
+          <div class= "other" id="other" draggable="true" ondragstart="drag(event)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="customization">
+      <div class="undoredodel">
+        <button id="undo" onclick="undo()">Undo</button>
+        <button id="redo" onclick="redo()">Redo</button>
+        <button id="duplicate" onclick="duplicate()">Duplicate</button>
+        <button id="delete" onclick="deleteItem()">Delete</button>
+      </div>
+      <div class="color">
+        <h2 id="color-title">Color</h2>
+        <div class="color-grid" id="color-grid">
+          <img src="colorselect.png" id="color-wheel" draggable="false" style="display: none;"/>
+          <canvas id="colorCanvas" class="color-canvas" width="120" height="110" draggable="false"></canvas>
+          <input type="range" min="0" max="10" value="5" class="color-slider" id="color-range">
+        </div>
+      </div>
+      <div class="speed">
+        <h2 id="speed-title">Speed</h2>
+        <input type="range" min="1" max="5" value="3" class="slider" id="speed-range">
+        <p>Value (1=slow, 5=fast): <span id="value"></span></p>
+      </div>
+      <h2 id="movement-title">Movement</h2>
+      <div class="movement">
+        <div id="fur-patch-movement" style="display: none;">
+            <input type="radio" id="shake" name="item-movement" value="Shake">
+            <label for="shake">Shake</label><br>
+            <input type="radio" id="stick-up" name="item-movement" value="Stick up">
+            <label for="stick-up">Stick up</label><br>
+        </div>
+        <div id="light-ind-movement" style="display: none;">
+            <input type="radio" id="light-on" name="item-movement" value="Light on ind">
+            <label for="light-on">Light on</label><br>
+            <input type="radio" id="flash" name="item-movement" value="Flash ind">
+            <label for="flash">Flash</label><br>
+        </div>
+        <div id="light-strip-movement" style="display: none;">
+            <input type="radio" id="light-on" name="item-movement" value="Light on str">
+            <label for="light-on">Light on</label><br>
+            <input type="radio" id="flash" name="item-movement" value="Flash str">
+            <label for="flash">Flash</label><br>
+            <input type="radio" id="trickle-up" name="item-movement" value="Trickle up">
+            <label for="trickle-up">Trickle up</label><br>
+            <input type="radio" id="trickle-down" name="item-movement" value="Trickle down">
+            <label for="trickle-down">Trickle down</label><br>
+            <input type="radio" id="random-fl" name="item-movement" value="Random fl">
+            <label for="random-fl">Random flash</label><br>
+        </div>
+        <div id="display-movement" style="display: none;">
+            <input type="radio" id="social-battery" name="item-movement" value="Social battery">
+            <label for="social-battery">Social Battery</label><br>
+        </div>
+        <div id="speaker-movement" style="display: none;">
+            <input type="radio" id="loud" name="item-movement" value="Loud">
+            <label for="loud">Loud</label><br>
+            <input type="radio" id="quiet" name="item-movement" value="Quiet">
+            <label for="quiet">Quiet</label><br>
+        </div>
+        <div id="other-movement" style="display: none;">
+        </div>
+      </div>
+      <div class="custom-user-input">
+        <h2 id="custom-title">Write my own:</h2>
+        <textarea id="custom-input" name="item-movement" rows="2" cols="22"></textarea>
+    </div>
+      <div class="save">
+        <button type="button" id="save-button" onclick="saveFile()">Submit</button>
+      </div>
+    </div>
+  </div>
+</body>
