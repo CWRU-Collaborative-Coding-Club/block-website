@@ -1,4 +1,6 @@
-//add items to front or back & switch views
+/**
+ * append items to front or back of the jacket & switch views
+ */
 var frontItems = [];
 var backItems = [];
 var currView = "front";
@@ -7,20 +9,18 @@ function switchView() {
     const back = document.getElementById('jacket-back');
     const jacketCanvas = document.getElementById('jacketCanvas');
     const jacketCtx = jacketCanvas.getContext('2d');
-    if (currView == "front") {//front.style.display != 'none') {
+    if (currView == "front") {
         for (let i = 0; i < frontItems.length; i++) {
             frontItems[i].style.display = 'none';
         }
         for (let i = 0; i < backItems.length; i++) {
             backItems[i].style.display = 'block';
         }
-        //front.style.display = 'none';
-        //back.style.display = 'block';
         jacketCtx.clearRect(0,0,jacketCanvas.width,jacketCanvas.height);
         jacketCtx.drawImage(back,0,0,jacketCanvas.width,jacketCanvas.height);
         currView = "back";
         document.getElementById('front-view').style.display = 'block';
-        document.getElementById('back-view').style.display = 'none';
+        document.getElementById('back-view').style.display = 'none'; //switch view to back of jacket
     } else {
         for (let i = 0; i < frontItems.length; i++) {
             frontItems[i].style.display = 'block';
@@ -28,17 +28,18 @@ function switchView() {
         for (let i = 0; i < backItems.length; i++) {
             backItems[i].style.display = 'none';
         }
-        //front.style.display = 'block';
-        //back.style.display = 'none';
         jacketCtx.clearRect(0,0,jacketCanvas.width,jacketCanvas.height);
         jacketCtx.drawImage(front,0,0,jacketCanvas.width,jacketCanvas.height);
         currView = "front";
         document.getElementById('back-view').style.display = 'block';
-        document.getElementById('front-view').style.display = 'none';
+        document.getElementById('front-view').style.display = 'none'; //switch view to front of jacket
     }
 }
 
-//drag and drop functionality
+/**
+ * drag and drop functionality for adding items from the left sidebar onto the jacket
+ * works properly except WIP: have light items default as flashing
+ */
 function dragOver(e) {
     e.preventDefault();
 }
@@ -51,11 +52,11 @@ function drop(e) {
     const item = document.getElementById(data);
     const dropArea = document.getElementById('jacketbox');
     const alreadyDroppedItem = dropArea.querySelector(`#${data}`);
-    const jacketCanvas = document.getElementById('jacketCanvas');
+    const jacketCanvas = document.getElementById('jacketCanvas'); //canvas to prevent items from being dropped outside of the jacket
     const jacketCtx = jacketCanvas.getContext('2d');
     var imgData = jacketCtx.getImageData(e.offsetX, e.offsetY, 1, 1);
     var rgba = imgData.data;
-    if (alreadyDroppedItem) {
+    if (alreadyDroppedItem) { //reposition item if it's already existing on jacket
         if (rgba[3] !== 0) {
             positionItem(alreadyDroppedItem, e, dropArea);
         } else {
@@ -68,6 +69,7 @@ function drop(e) {
             clonedItem.id = uniqueId;
             clonedItem.className = item.className + ' dropped-item';
             clonedItem.style.cssText = item.style.cssText;
+            //WIP: default the light items as flashing immediately when they're dragged onto the jacket
             /*if (clonedItem.id.startsWith('light-ind')) {
                 clonedItem.style.backgroundColor = defaultColor;
                 clonedItem.setAttribute('data-flashing-color', defaultColor);
@@ -77,7 +79,7 @@ function drop(e) {
                 });
                 clonedItem.setAttribute('data-flashing-color', defaultColor);
             }*/
-            dropArea.appendChild(clonedItem);
+            dropArea.appendChild(clonedItem); //append dragged item to jacket
             positionItem(clonedItem, e, dropArea);
             /*if (clonedItem.id.startsWith('light-ind')) {
                 //document.querySelector('input[name="item-movement"][value="Flash ind"]').checked = true;
@@ -88,11 +90,10 @@ function drop(e) {
                 //selectedColor = 'grey';
                 flashAnimation(clonedItem);
             }*/
-
-            clonedItem.addEventListener('click', function() {
+            clonedItem.addEventListener('click', function() { //for duplicated items
                 selectItem(clonedItem);
             });
-            if (currView == "front") {
+            if (currView == "front") { //add items based on jacket view
                 frontItems.push(clonedItem);
             } else if (currView == "back") {
                 backItems.push(clonedItem);
@@ -104,17 +105,18 @@ function drop(e) {
     }
 }
 
+/**
+ * position item on jacket
+ */
 function positionItem(item, e, area) {
     const rect = area.getBoundingClientRect();
-    //const offsetX = -345;
-    //const offsetY = -30;
-    const xVal = e.clientX-rect.left-item.offsetWidth/2;//-offsetX;
-    const yVal = e.clientY-rect.top-item.offsetHeight/2;//-offsetY;
+    const xVal = e.clientX-rect.left-item.offsetWidth/2;
+    const yVal = e.clientY-rect.top-item.offsetHeight/2;
     item.style.position = 'absolute';
     item.style.left = `${xVal}px`;
     item.style.top = `${yVal}px`;
     item.style.zIndex = '10';
-    if (item.id.startsWith('light-strip')) {
+    if (item.id.startsWith('light-strip')) { //certain items need different offsets
         item.style.left=`${xVal-10}px`;
     } else if (item.id.startsWith('battery')) {
         item.style.left=`${xVal-30}px`;
@@ -123,10 +125,14 @@ function positionItem(item, e, area) {
         item.style.left=`${xVal-20}px`;
         item.style.top=`${yVal-20}px`;
     }
-    item.x = xVal;
+    item.x = xVal; //this is for saving the info to the CSV
     item.y = yVal;
 }
 
+/**
+ * selecting the item that's been clicked
+ * preferably fix the blue highlight for fur, battery, speaker, other to outline the whole shape but low priority
+ */
 function selectItem(item) {
     document.querySelectorAll('.dropped-item').forEach(item => {
         item.classList.remove('selected-item');
@@ -137,13 +143,13 @@ function selectItem(item) {
     });
     item.classList.add('selected-item');
     const rotateCircle = document.createElement('div');
-    rotateCircle.classList.add('rotate-circle');
+    rotateCircle.classList.add('rotate-circle'); //adds circle for rotation functionality
     item.appendChild(rotateCircle);
     rotateItem(item, rotateCircle);
     if (item.id.startsWith('light-strip') || item.id.startsWith('battery') || item.id.startsWith('speaker') || item.id.startsWith('fur-patch')) {
         item.style.border = 'none';
     }
-    if (item.id.startsWith('light-strip')) {
+    if (item.id.startsWith('light-strip')) { //certain items need different displays to keep the visuals consistent
         rotateCircle.style.top = '-27px';
         rotateCircle.style.transform = 'translateX(30%)';
     } else if (item.id.startsWith('battery')) {
@@ -163,7 +169,7 @@ function selectItem(item) {
         document.getElementById('custom-title').textContent = "Write my own:";
     }
     let baseId = item.id;
-    if (baseId.includes('copy')) {
+    if (baseId.includes('copy')) { //formatting item ID for duplicated items
         baseId = item.id.split('-').slice(0, -2).join('-');
     } else {
         baseId = item.id.split('-').slice(0, -1).join('-');
@@ -175,6 +181,9 @@ function selectItem(item) {
     loadItemSelections(item.id);
 }
 
+/**
+ * rotating the item by clicking on the circle above it when selected
+ */
 function rotateItem(item, rotateCircle) {
     let rotating = false;
     let ogAngle = 0;
@@ -204,6 +213,7 @@ function rotateItem(item, rotateCircle) {
         rotating = false;
     });
 }
+//helper function for rotating
 function getCurrAngle(item) {
     const style = window.getComputedStyle(item);
     let transform;
@@ -219,14 +229,18 @@ function getCurrAngle(item) {
     return Math.atan2(parseFloat(matrix[1]),parseFloat(matrix[0]));
 }
 
-//saving and loading item selections/customizations
+/**
+ * saving and loading item selections/customizations to front or back of jacket
+ */
 var itemSelections = {
     front: {},
     back: {}
 };
+//saves the customization selections of an item
 function saveItemSelections(itemID, radioSelection, sliderValue, userInput) {
     itemSelections[currView][itemID] = {radioSelection, sliderValue, userInput};
 }
+//loads the customization selections of the right sidebar for the selected item
 function loadItemSelections(itemID) {
     const selection = itemSelections[currView][itemID];
     if (selection) {
@@ -249,7 +263,7 @@ function loadItemSelections(itemID) {
                 userInputBox.value = '';
             }
         }
-    } else {
+    } else { //resets the customization items
         resetRadioButtons();
         resetSlider();
         resetUserInput();
@@ -280,23 +294,26 @@ const defaultColor = 'grey';
 let rgba2 = [];
 
 document.addEventListener('DOMContentLoaded', function() {
-    //draw jacket image to canvas
+    //jacket image to canvas
     const jacketCanvas = document.getElementById('jacketCanvas');
     const jacketCtx = jacketCanvas.getContext('2d');
     jacketCtx.clearRect(0,0,jacketCanvas.width,jacketCanvas.height);
     jacketCtx.drawImage(document.getElementById('jacket-front'),0,0,jacketCanvas.width,jacketCanvas.height);
-    //draw color select image to canvas
+    //color select image to canvas
     const colorCanvas = document.getElementById('colorCanvas');
     const colorCtx = colorCanvas.getContext('2d');
     colorCtx.drawImage(document.getElementById('color-wheel'),0,0,colorCanvas.width,colorCanvas.height);
-    //color selecting functionality
+    /**
+     * color selecting functionality
+     * for both the jacket and color canvases, sometimes when the page loads/is refreshed, the images don't show up
+     */
     colorCanvas.addEventListener('click', function(e) {
         var imgData = colorCtx.getImageData(e.offsetX, e.offsetY, 1, 1);
         var rgba = imgData.data;
         const rect = colorCanvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        if (rgba[3] !== 0) { //if click isnt on transparent area of image
+        if (rgba[3] !== 0) { //if click isnt on transparent area of color wheel image
             selectedColor = `rgba(${rgba[0]}, ${rgba[1]}, ${rgba[2]}, ${rgba[3] / 255})`;
             rgba2[0] = rgba[0];
             rgba2[1] = rgba[1];
@@ -316,7 +333,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     selectedItem.setAttribute('data-flashing-color', selectedColor);
                 }
                 selectedItem.color = selectedColor;
-                //let lighterColor = `rgba(${rgba[0]+20}, ${rgba[1]+20}, ${rgba[2]+20}, ${rgba[3] / 255})`;
                 document.getElementById('color-range').style.background = `linear-gradient(to right, white, ${selectedColor}, black)`;
             }
             colorCtx.clearRect(0,0,colorCanvas.width,colorCanvas.height);
@@ -328,6 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
             colorCtx.stroke();
         }
     });
+    //color gradient slider
     document.getElementById('color-range').addEventListener('input', function() {
         selectedColor = updateShade(this.value);
         const selectedItem = document.querySelector('.dropped-item.selected-item');
@@ -347,8 +364,11 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedItem.color = selectedColor;
         }
     });
+    /**
+     * create item when clicking anywhere on the jacket
+     * WIP
+     */
     let clickOpen = false;
-    //create item when clicking jacket
     jacketCanvas.addEventListener('click', function(e) {
         var imgData = jacketCtx.getImageData(e.offsetX, e.offsetY, 1, 1);
         var rgba = imgData.data;
@@ -376,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.click-item').forEach(item => {
         const dropArea = document.getElementById('jacketbox');
         let clickedItem = null;
-        item.addEventListener('click', function(e) {
+        item.addEventListener('click', function(e) { //propagating clicked item on the jacket when selecting it in the popup
             if (e.target.id == 'click-fur') {
                 const furNodeList = document.querySelectorAll('.fur-patch');
                 for (let i = 0; i < furNodeList.length; i++) {
@@ -457,24 +477,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    //slider functionality
+    /**
+     * slider functionality to choose speed
+     */
     var slider = document.getElementById("speed-range");
     var output = document.getElementById("value");
     output.innerHTML = slider.value;
     slider.oninput = function() {
         output.innerHTML = this.value;
-        //currSpeed = this.value * 10;
     }
-    //saving radio button selection
+    /**
+     * saving radio button customization selection
+     */
     document.querySelectorAll('input[name="item-movement"]').forEach(radio => {
         radio.addEventListener('change', function() {
             const selectedItem = document.querySelector('.dropped-item.selected-item');
             if (selectedItem) {
                 const sliderVal = document.getElementById("speed-range").value;
                 saveItemSelections(selectedItem.id, this.value, sliderVal, document.getElementById("custom-input").value);
-                if (radio.value.includes('Light on')) {
+                if (radio.value.includes('Light on')) { //stop the flash animation for the lights
                     stopFlash(selectedItem);
-                } else if (radio.value.includes('Flash')) {
+                } else if (radio.value.includes('Flash')) { //change flash animation based on selected radio button
                     updateSpeed(sliderVal);
                     flashAnimation(selectedItem);
                     document.getElementById("speed-range").addEventListener('input', function() {
@@ -528,7 +551,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    //saving user input
+    /**
+     * saving user input in the write my own box
+     */
     document.getElementById("custom-input").addEventListener('input', function(){
         const selectedItem = document.querySelector('.dropped-item.selected-item');
         let radioValue;
@@ -543,7 +568,9 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedItem.userinput = document.getElementById("custom-input").value;
         }
     });
-    //saving slider selection
+    /**
+     * saving slider selection for speed
+     */
     document.getElementById("speed-range").addEventListener('input', function() {
         const selectedItem = document.querySelector('.dropped-item.selected-item');
         let radioValue;
@@ -559,7 +586,9 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSpeed(this.value);
         }
     });
-    //delete item
+    /**
+     * delete item
+     */
     document.addEventListener('keydown', (e) => {
         const selectedItem = document.querySelector('.dropped-item.selected-item');
         if (document.activeElement.id.startsWith('custom-input')) {
@@ -579,7 +608,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    //user input for popup
+    /**
+     * user input for intro popup
+     */
     const p1 = document.getElementById("participant1");
     const vN1 = document.getElementById("videoNum1")
     p1.addEventListener('input', function() {
@@ -596,7 +627,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById("continue-button").disabled = true;
         }
     });
-    //info popup
+    /**
+     * info popup
+     */
     document.querySelector('.popup-info').style.display = 'none';
     document.getElementById('info-button').addEventListener('click', function() {
         document.querySelector('.popup-info').style.display = 'block';
@@ -604,7 +637,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('close-info').addEventListener('click', function() {
         document.querySelector('.popup-info').style.display = 'none';
     });
-    //clicking to deselect
+    /**
+     * clicking to deselect an item
+     * WIP: still need to hide customization selections, and also clicking on the jacket to deselect brings up the propagation item menu,
+     * deselect visually doesn't work for items that are combos of shapes & the rotate circle goes away (fur, light strip, battery,
+     * speaker)
+     * additionally, when dragging the rotate circle & your cursor moves off of the circle while still dragging, the deselect function
+     * is triggered for that item and the item that's being rotated gets deselected
+     */
     document.querySelector('.container').addEventListener('click', function(e) {
         const selectedItem = document.querySelector('.dropped-item.selected-item');
         if (selectedItem && e.target != selectedItem && !e.target.closest('.customization') && !e.target.closest('.rotate-circle')) {
@@ -617,6 +657,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+//helper item for positioning the propagated an item when clicking the jacket
 function clickPositionItem(item, e, area) {
     const rect = area.getBoundingClientRect();
     const xVal = e.clientX-rect.left-item.offsetWidth/2;
@@ -638,6 +679,7 @@ function clickPositionItem(item, e, area) {
     item.y = yVal;
 }
 
+//helper method for gradient color slider
 function updateShade(sliderVal) {
     let color2 = null;
     let ratio = null;
@@ -651,6 +693,7 @@ function updateShade(sliderVal) {
     return color2;
 }
 
+//helper method for updating the speed of the flashing animations (1-slow, 5-fast)
 function updateSpeed(sliderVal) {
     if (sliderVal == 1) {
         currSpeed = 700;
@@ -665,7 +708,7 @@ function updateSpeed(sliderVal) {
     }
 }
 
-//normalize/reformat color string so rgba comparison works
+//helper method for normalizing/reformatting color string so rgba comparison works
 function normalizeColorStr(colorStr) {
     colorStr = colorStr.replace(/\s+/g, '').toLowerCase();
     if (colorStr.startsWith('rgb(') && !colorStr.startsWith('rgba')) {
@@ -677,6 +720,14 @@ function normalizeColorStr(colorStr) {
     return colorStr;
 }
 
+/**
+ * flash animation functionality
+ * current issues: when 2 light items are dragged on and radio buttons for animations r selected, the visual flashing animation "breaks"
+ * and doesn't show what was selected for that item (i.e. if trickle up was selected for light #1 but then regular flash is selected for
+ * light #2, the flash animation for light #1 will look like flashing too) however, the radio button selection is still saved/good for
+ * what was originally selected
+ * this can be seen when the speed is adjusted for one of the lights as well
+ */
 function flashAnimation(item, flashPattern) {
     flashingItems.add(item);
     let lights = Array.from(item.querySelectorAll('.circle'));
@@ -749,7 +800,6 @@ function flashAnimation(item, flashPattern) {
         }, currSpeed);
     }
 }
-
 //light on & no flash option
 function stopFlash(item) {
     flashingItems.delete(item);
@@ -772,7 +822,9 @@ function stopFlash(item) {
     }
 }
 
-//duplicate selected item
+/**
+ * duplicate selected item
+ */
 function duplicate() {
     const selectedItem = document.querySelector('.dropped-item.selected-item');
     if (selectedItem) {
@@ -824,27 +876,29 @@ function duplicate() {
 }
 
 function undo() {
-    //WIP: testing in other file
+    //WIP
 }
 
 function redo() {
-    //WIP: testing in other file
+    //WIP
 }
 
-//delete selected item
+/**
+ * delete selected item
+ */
 function deleteItem() {
     const selectedItem = document.querySelector('.dropped-item.selected-item');
     if (selectedItem) {
         if (currView == 'front') {
             for (let i = 0; i < frontItems.length; i++) {
                 if (frontItems[i].id == selectedItem.id) {
-                    frontItems[i].id = "DELETED"+frontItems[i].id;//frontItems.splice(i,1);
+                    frontItems[i].id = "DELETED"+frontItems[i].id;
                 }
             }
         } else if (currView == 'back') {
             for (let i = 0; i < backItems.length; i++) {
                 if (backItems[i].id == selectedItem.id) {
-                    backItems[i].id = "DELETED"+backItems[i].id;//backItems.splice(i,1);
+                    backItems[i].id = "DELETED"+backItems[i].id;
                 }
             }
         }
@@ -852,13 +906,18 @@ function deleteItem() {
     }
 }
 
+/**
+ * continue after user completes intro popup
+ */
 function continueToGUI() {
     document.querySelector(".popup").style.display = 'none';
     document.getElementById("participant").value = document.getElementById("participant1").value;
     document.getElementById("videoNum").value = document.getElementById("videoNum1").value;
 }
 
-//test --> also going to change this
+/**
+ * saving all info to CSV file
+ */
 function saveFile() {
     const participantNum = document.getElementById('participant').value;
     const videoNum = document.getElementById('videoNum').value;

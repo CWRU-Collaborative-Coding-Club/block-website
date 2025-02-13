@@ -1,9 +1,9 @@
 <link rel="stylesheet" href="style.css" />
 <script src="script.js"></script>
 <h1 id="title">Wearable Design</h1>
-<button id="info-button">?</button>
+<button id="info-button">?</button> <!--info button at the top of the screen users can access anytime for brief instructions-->
 <body>
-  <div class="popup">
+  <div class="popup"> <!--popup that first appears to prompt users to put in their info before continuing to GUI-->
     <div class="popup-instructions">
       <h1 id="popup-title">Instructions</h1>
       <p id="popup-text"><br>Welcome to the Affect-Sensing Wearable graphical user interface (GUI)!</br><br>Please drag & drop features from the left sidebar onto the jacket image based on the video you have watched. You can consider emotional expression and desired social-physical interaction. From the right sidebar, you can make customizations and selections for various actuation methods.</br><br>Before beginning, please enter your participant number and video code below:</br></p>
@@ -18,13 +18,13 @@
   </div>
   <div class="container">
     <div class="box">
-      <div class="jacketbox" id="jacketbox">
+      <div class="jacketbox" id="jacketbox"> <!--jacket-->
         <img src="jacketfront.png" id="jacket-front" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)" style="display: none;"/>
         <img src="jacketback.png" id="jacket-back" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)" style="display: none;" />
         <canvas id="jacketCanvas" class="jacket-canvas" width="480" height="550" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)"></canvas>
         <button id="back-view" onclick="switchView()">Switch to Back</button>
         <button id="front-view" onclick="switchView()" style="display: none;">Switch to Front</button>
-        <div class="click-create" style="display: none;">
+        <div class="click-create" style="display: none;"> <!--propagate items by clicking directly on the jacket-->
           <div class="click-item" id="click-fur">Fur Patch</div>
           <div class="click-item" id="click-light1">Individual Light</div>
           <div class="click-item" id="click-light2">Light Strip</div>
@@ -35,13 +35,12 @@
         </div>
       </div>
     </div>
-    <div class="popup-info">
+    <div class="popup-info"> <!--popup from the info button at the top of the screen-->
       <button id="close-info">x</button>
       <h1 id="info-title">Instructions</h1>
       <p id="info-text">Drag & drop features from the left sidebar onto the jacket image based on the video you have watched. You can consider emotional expression and desired social-physical interaction. From the right sidebar, you can make customizations and selections for various actuation methods.</p>
     </div>
-    <div class="sidebar">
-      <!--<button id="info-button">?</button>-->
+    <div class="sidebar"> <!--left sidebar with user info & draggable items-->
       <div class="identifiers">
         <label for="participant" id="pNum">Participant #:</label>
         <input type="text" id="participant"/>
@@ -114,14 +113,14 @@
         </div>
       </div>
     </div>
-    <div class="customization">
-      <div class="undoredodel">
+    <div class="customization"> <!--right sidebar with customization options & buttons-->
+      <div class="undoredodel"> <!--undo, redo, delete buttons-->
         <button id="undo" onclick="undo()">Undo</button>
         <button id="redo" onclick="redo()">Redo</button>
         <button id="duplicate" onclick="duplicate()">Duplicate</button>
         <button id="delete" onclick="deleteItem()">Delete</button>
       </div>
-      <div class="color">
+      <div class="color"> <!--color select functionality-->
         <h2 id="color-title">Color</h2>
         <div class="color-grid" id="color-grid">
           <img src="colorselect.png" id="color-wheel" draggable="false" style="display: none;"/>
@@ -129,13 +128,13 @@
           <input type="range" min="0" max="10" value="5" class="color-slider" id="color-range">
         </div>
       </div>
-      <div class="speed">
+      <div class="speed"> <!--speed slider-->
         <h2 id="speed-title">Speed</h2>
         <input type="range" min="1" max="5" value="3" class="slider" id="speed-range">
         <p>Value (1=slow, 5=fast): <span id="value"></span></p>
       </div>
       <h2 id="movement-title">Movement</h2>
-      <div class="movement">
+      <div class="movement"> <!--movement/animation customizations for each draggable item-->
         <div id="fur-patch-movement" style="display: none;">
             <input type="radio" id="shake" name="item-movement" value="Shake">
             <label for="shake">Shake</label><br>
@@ -177,7 +176,7 @@
         <h2 id="custom-title">Write my own:</h2>
         <textarea id="custom-input" name="item-movement" rows="2" cols="22"></textarea>
     </div>
-      <div class="save">
+      <div class="save"> <!--save button that saves to CSV file downloaded to browser-->
         <button type="button" id="save-button" onclick="saveFile()">Submit</button>
       </div>
     </div>
