@@ -7,20 +7,18 @@ function switchView() {
     const back = document.getElementById('jacket-back');
     const jacketCanvas = document.getElementById('jacketCanvas');
     const jacketCtx = jacketCanvas.getContext('2d');
-    if (currView == "front") {//front.style.display != 'none') {
+    if (currView == "front") {
         for (let i = 0; i < frontItems.length; i++) {
             frontItems[i].style.display = 'none';
         }
         for (let i = 0; i < backItems.length; i++) {
             backItems[i].style.display = 'block';
         }
-        //front.style.display = 'none';
-        //back.style.display = 'block';
         jacketCtx.clearRect(0,0,jacketCanvas.width,jacketCanvas.height);
         jacketCtx.drawImage(back,0,0,jacketCanvas.width,jacketCanvas.height);
         currView = "back";
         document.getElementById('front-view').style.display = 'block';
-        document.getElementById('back-view').style.display = 'none';
+        document.getElementById('back-view').style.display = 'none'; //switch view to back of jacket
     } else {
         for (let i = 0; i < frontItems.length; i++) {
             frontItems[i].style.display = 'block';
@@ -28,13 +26,11 @@ function switchView() {
         for (let i = 0; i < backItems.length; i++) {
             backItems[i].style.display = 'none';
         }
-        //front.style.display = 'block';
-        //back.style.display = 'none';
         jacketCtx.clearRect(0,0,jacketCanvas.width,jacketCanvas.height);
         jacketCtx.drawImage(front,0,0,jacketCanvas.width,jacketCanvas.height);
         currView = "front";
         document.getElementById('back-view').style.display = 'block';
-        document.getElementById('front-view').style.display = 'none';
+        document.getElementById('front-view').style.display = 'none'; //switch view to front of jacket
     }
 }
 
@@ -51,11 +47,11 @@ function drop(e) {
     const item = document.getElementById(data);
     const dropArea = document.getElementById('jacketbox');
     const alreadyDroppedItem = dropArea.querySelector(`#${data}`);
-    const jacketCanvas = document.getElementById('jacketCanvas');
+    const jacketCanvas = document.getElementById('jacketCanvas'); //canvas to prevent items from being dropped outside of the jacket
     const jacketCtx = jacketCanvas.getContext('2d');
     var imgData = jacketCtx.getImageData(e.offsetX, e.offsetY, 1, 1);
     var rgba = imgData.data;
-    if (alreadyDroppedItem) {
+    if (alreadyDroppedItem) { //reposition item if it's already existing on jacket
         if (rgba[3] !== 0) {
             positionItem(alreadyDroppedItem, e, dropArea);
         } else {
@@ -92,7 +88,7 @@ function drop(e) {
             clonedItem.addEventListener('click', function() {
                 selectItem(clonedItem);
             });
-            if (currView == "front") {
+            if (currView == "front") { //add items based on jacket view
                 frontItems.push(clonedItem);
             } else if (currView == "back") {
                 backItems.push(clonedItem);
@@ -104,17 +100,16 @@ function drop(e) {
     }
 }
 
+//position item on jacket
 function positionItem(item, e, area) {
     const rect = area.getBoundingClientRect();
-    //const offsetX = -345;
-    //const offsetY = -30;
     const xVal = e.clientX-rect.left-item.offsetWidth/2;//-offsetX;
     const yVal = e.clientY-rect.top-item.offsetHeight/2;//-offsetY;
     item.style.position = 'absolute';
     item.style.left = `${xVal}px`;
     item.style.top = `${yVal}px`;
     item.style.zIndex = '10';
-    if (item.id.startsWith('light-strip')) {
+    if (item.id.startsWith('light-strip')) { //certain items need different offsets
         item.style.left=`${xVal-10}px`;
     } else if (item.id.startsWith('battery')) {
         item.style.left=`${xVal-30}px`;
@@ -123,10 +118,11 @@ function positionItem(item, e, area) {
         item.style.left=`${xVal-20}px`;
         item.style.top=`${yVal-20}px`;
     }
-    item.x = xVal;
+    item.x = xVal; //this is for saving the info to the CSV
     item.y = yVal;
 }
 
+//selecting the item that's been clicked
 function selectItem(item) {
     document.querySelectorAll('.dropped-item').forEach(item => {
         item.classList.remove('selected-item');
@@ -137,13 +133,13 @@ function selectItem(item) {
     });
     item.classList.add('selected-item');
     const rotateCircle = document.createElement('div');
-    rotateCircle.classList.add('rotate-circle');
+    rotateCircle.classList.add('rotate-circle'); //adds circle for rotation functionality
     item.appendChild(rotateCircle);
     rotateItem(item, rotateCircle);
     if (item.id.startsWith('light-strip') || item.id.startsWith('battery') || item.id.startsWith('speaker') || item.id.startsWith('fur-patch')) {
         item.style.border = 'none';
     }
-    if (item.id.startsWith('light-strip')) {
+    if (item.id.startsWith('light-strip')) { //certain items need different displays to keep the visuals consistent
         rotateCircle.style.top = '-27px';
         rotateCircle.style.transform = 'translateX(30%)';
     } else if (item.id.startsWith('battery')) {
@@ -175,6 +171,7 @@ function selectItem(item) {
     loadItemSelections(item.id);
 }
 
+//rotating the item by clicking on the circle above it when selected
 function rotateItem(item, rotateCircle) {
     let rotating = false;
     let ogAngle = 0;
@@ -204,6 +201,7 @@ function rotateItem(item, rotateCircle) {
         rotating = false;
     });
 }
+//helper function for rotating
 function getCurrAngle(item) {
     const style = window.getComputedStyle(item);
     let transform;
@@ -224,9 +222,11 @@ var itemSelections = {
     front: {},
     back: {}
 };
+//saves the customization selections
 function saveItemSelections(itemID, radioSelection, sliderValue, userInput) {
     itemSelections[currView][itemID] = {radioSelection, sliderValue, userInput};
 }
+//loads the customization selections of the selected item
 function loadItemSelections(itemID) {
     const selection = itemSelections[currView][itemID];
     if (selection) {
@@ -249,7 +249,7 @@ function loadItemSelections(itemID) {
                 userInputBox.value = '';
             }
         }
-    } else {
+    } else { //resets the customization items
         resetRadioButtons();
         resetSlider();
         resetUserInput();
@@ -328,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
             colorCtx.stroke();
         }
     });
+    //color gradient slider
     document.getElementById('color-range').addEventListener('input', function() {
         selectedColor = updateShade(this.value);
         const selectedItem = document.querySelector('.dropped-item.selected-item');
@@ -348,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     let clickOpen = false;
-    //create item when clicking jacket
+    //create item when clicking anywhere on the jacket
     jacketCanvas.addEventListener('click', function(e) {
         var imgData = jacketCtx.getImageData(e.offsetX, e.offsetY, 1, 1);
         var rgba = imgData.data;
@@ -376,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.click-item').forEach(item => {
         const dropArea = document.getElementById('jacketbox');
         let clickedItem = null;
-        item.addEventListener('click', function(e) {
+        item.addEventListener('click', function(e) { //propagating clicked item on the jacket when selecting it in the popup
             if (e.target.id == 'click-fur') {
                 const furNodeList = document.querySelectorAll('.fur-patch');
                 for (let i = 0; i < furNodeList.length; i++) {
@@ -457,24 +458,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    //slider functionality
+    //slider functionality to choose speed
     var slider = document.getElementById("speed-range");
     var output = document.getElementById("value");
     output.innerHTML = slider.value;
     slider.oninput = function() {
         output.innerHTML = this.value;
-        //currSpeed = this.value * 10;
     }
-    //saving radio button selection
+    //saving radio button customization selection
     document.querySelectorAll('input[name="item-movement"]').forEach(radio => {
         radio.addEventListener('change', function() {
             const selectedItem = document.querySelector('.dropped-item.selected-item');
             if (selectedItem) {
                 const sliderVal = document.getElementById("speed-range").value;
                 saveItemSelections(selectedItem.id, this.value, sliderVal, document.getElementById("custom-input").value);
-                if (radio.value.includes('Light on')) {
+                if (radio.value.includes('Light on')) { //stop the flash animation for the lights
                     stopFlash(selectedItem);
-                } else if (radio.value.includes('Flash')) {
+                } else if (radio.value.includes('Flash')) { //change flash animation based on selected radio button
                     updateSpeed(sliderVal);
                     flashAnimation(selectedItem);
                     document.getElementById("speed-range").addEventListener('input', function() {
@@ -543,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedItem.userinput = document.getElementById("custom-input").value;
         }
     });
-    //saving slider selection
+    //saving slider selection for speed
     document.getElementById("speed-range").addEventListener('input', function() {
         const selectedItem = document.querySelector('.dropped-item.selected-item');
         let radioValue;
@@ -579,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    //user input for popup
+    //user input for intro popup
     const p1 = document.getElementById("participant1");
     const vN1 = document.getElementById("videoNum1")
     p1.addEventListener('input', function() {
@@ -604,7 +604,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('close-info').addEventListener('click', function() {
         document.querySelector('.popup-info').style.display = 'none';
     });
-    //clicking to deselect
+    //clicking to deselect an item
     document.querySelector('.container').addEventListener('click', function(e) {
         const selectedItem = document.querySelector('.dropped-item.selected-item');
         if (selectedItem && e.target != selectedItem && !e.target.closest('.customization') && !e.target.closest('.rotate-circle')) {
@@ -617,6 +617,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+//helper item for positioning the propagated an item when clicking the jacket
 function clickPositionItem(item, e, area) {
     const rect = area.getBoundingClientRect();
     const xVal = e.clientX-rect.left-item.offsetWidth/2;
@@ -638,6 +639,7 @@ function clickPositionItem(item, e, area) {
     item.y = yVal;
 }
 
+//helper method for gradient color slider
 function updateShade(sliderVal) {
     let color2 = null;
     let ratio = null;
@@ -651,6 +653,7 @@ function updateShade(sliderVal) {
     return color2;
 }
 
+//helper method for updating the speed of the flashing animations
 function updateSpeed(sliderVal) {
     if (sliderVal == 1) {
         currSpeed = 700;
@@ -677,6 +680,7 @@ function normalizeColorStr(colorStr) {
     return colorStr;
 }
 
+//flash animation functionality
 function flashAnimation(item, flashPattern) {
     flashingItems.add(item);
     let lights = Array.from(item.querySelectorAll('.circle'));
@@ -852,13 +856,14 @@ function deleteItem() {
     }
 }
 
+//continue after user completes intro popup
 function continueToGUI() {
     document.querySelector(".popup").style.display = 'none';
     document.getElementById("participant").value = document.getElementById("participant1").value;
     document.getElementById("videoNum").value = document.getElementById("videoNum1").value;
 }
 
-//test --> also going to change this
+//saving all info to CSV file
 function saveFile() {
     const participantNum = document.getElementById('participant').value;
     const videoNum = document.getElementById('videoNum').value;
